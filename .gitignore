@@ -1,0 +1,135 @@
+# Build outputs
+bin/
+obj/
+out/
+publish/
+dist/
+build/
+
+# IDE and editor folders
+.vs/
+.vscode/
+.idea/
+.azure/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+.DS_Store
+
+# Environment and secrets
+.env
+.env.local
+.env.*.local
+*.pfx
+*.p12
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+local.settings.json
+
+# Azure Functions
+__blobstorage__/
+__queuestorage__/
+__azurite_db*__.json
+.python_packages/
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Dependency directories
+node_modules/
+jspm_packages/
+.pnp/
+.pnp.js
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+.venv/
+ENV/
+env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Package files
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# NuGet
+*.nupkg
+*.snupkg
+**/packages/*
+!**/packages/build/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# Temporary files
+*~
+*.swp
+*.tmp
+*.temp
+*.bak
+*.cache
+
+# Test coverage
+coverage/
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Docker
+*.dockerignore.bak
+
+# Sensitive data
+credentials.json
+secrets.yaml
+*.key
+*.pem
+*.crt
+
+# Internal documentation (not for public repo)
+MIGRATION_SUMMARY.md
+TRADEMARK_CLEANUP_SUMMARY.md
+GENERICIZATION_COMPLETE.md
+FINAL_CLEANUP_SUMMARY.md
+GITHUB_SETUP.md
+PITCH_NOTES.md
+codex_master_prompt.md
+flockcopilot_architecture_diagrams.zip
+flockcopilot_architecture_diagrams/
+docs/demo_assumptions.md
+docs/presentation_script.md
+docs/study_notes.md
+docs/archive/
+docs/archive/**
+docs/diagrams/
+docs/diagrams/**
+docs/best-practices/
+docs/best-practices/**
+iac/APIM_*.md
+iac/*APIM*.md
+iac/QUICK_START_APIM.md
+scripts/test_api.py

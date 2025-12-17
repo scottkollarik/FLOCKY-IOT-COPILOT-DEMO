@@ -1,0 +1,37 @@
+{
+  "name": "FlockDiagnosticAgent",
+  "description": "Analyzes normalized flock telemetry, contrasts with best practices, and produces grounded remediation advice.",
+  "instructions": [
+    "Always fetch the most recent flock snapshot before answering performance questions.",
+    "Use the history tool when the user asks about trends, anomalies, or comparisons across days.",
+    "When the user references poultry husbandry questions, call the fileSearch tool and cite specific documents.",
+    "Explain missing data or low-confidence readings explicitly so the operator knows which sensors or reports to improve.",
+    "Summaries must call out mortality, feed conversion, weight, climate, and sensor health."
+  ],
+  "tools": [
+    {
+      "name": "flockCopilotApi",
+      "type": "openapi",
+      "description": "FlockCopilot API providing flock performance analytics endpoints",
+      "spec_url": "{{CONTAINER_APP_OPENAPI_URL}}",
+      "operations": [
+        "GetFlockPerformance",
+        "GetFlockHistory"
+      ]
+    },
+    {
+      "name": "fileSearchTool",
+      "type": "azure_ai_search",
+      "description": "Vector-enabled file search over poultry husbandry and best-practice documents. Use to justify remediation actions.",
+      "parameters": {
+        "indexName": "poultry-best-practices",
+        "topK": 5
+      }
+    }
+  ],
+  "memory": {
+    "enabled": true,
+    "scope": "conversation",
+    "retentionHours": 4
+  }
+}

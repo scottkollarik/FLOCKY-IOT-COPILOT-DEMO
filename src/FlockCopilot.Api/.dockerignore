@@ -1,0 +1,53 @@
+# Build outputs
+bin/
+obj/
+out/
+publish/
+
+# IDE and editor folders
+.vs/
+.vscode/
+.idea/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+
+# Environment and secrets
+.env
+.env.local
+*.pfx
+*.p12
+appsettings.*.json
+!appsettings.json
+!appsettings.Development.json
+
+# Git
+.git/
+.gitignore
+.gitattributes
+
+# Documentation
+*.md
+!README.md
+
+# Test files
+**/test/**
+**/*.Tests/**
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+
+# Logs
+*.log
+logs/
+
+# Temporary files
+*~
+*.swp
+*.tmp
+*.temp

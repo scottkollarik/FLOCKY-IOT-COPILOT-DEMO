@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: Flock Diagnostic API
+  version: 1.0.0
+servers:
+  - url: https://func-flocky-63suqxsltdrwo.azurewebsites.net
+paths:
+  /api/flocks/{flockId}/performance:
+    get:
+      summary: Get latest flock performance snapshot
+      parameters:
+        - name: flockId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Target flock identifier.
+      responses:
+        '200':
+          description: Normalized flock performance record.
+  /api/flocks/{flockId}/history:
+    get:
+      summary: Get historical flock performance data
+      parameters:
+        - name: flockId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Target flock identifier.
+        - name: window
+          in: query
+          required: false
+          schema:
+            type: string
+            default: 7d
+          description: Lookback window such as 7d, 30d, or 72h.
+      responses:
+        '200':
+          description: Chronological list of normalized flock data.

@@ -1,0 +1,42 @@
+{
+  "name": "ManualReportExtractionAgent",
+  "description": "Reads producer-submitted PDF, DOCX, image, or CSV reports and emits a deterministic ManualReport DTO.",
+  "instructions": [
+    "Never hallucinate values. If a metric is absent, return null.",
+    "Normalize weight into pounds, temperature into Fahrenheit, and include any operator notes verbatim.",
+    "Capture data-completeness signals such as missing days or illegible handwriting.",
+    "Return JSON that matches ManualReport.cs exactly."
+  ],
+  "inputFormats": [
+    "application/pdf",
+    "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "text/csv",
+    "image/png",
+    "image/jpeg"
+  ],
+  "outputSchema": {
+    "ReportId": "string",
+    "ReportedAt": "ISO-8601 timestamp",
+    "Reporter": {
+      "Name": "string",
+      "Role": "string",
+      "Contact": "string"
+    },
+    "Metrics": {
+      "MortalityPercent": "number|null",
+      "FeedConversionRatio": "number|null",
+      "AverageWeightLbs": "number|null",
+      "WaterIntakeLiters": "number|null",
+      "FeedIntakeKg": "number|null",
+      "TemperatureAvgF": "number|null",
+      "HumidityPercent": "number|null"
+    },
+    "Notes": [
+      "string"
+    ],
+    "DataCompleteness": {
+      "GapsDetected": "boolean",
+      "CoverageDescription": "string"
+    }
+  }
+}

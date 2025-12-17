@@ -1,0 +1,85 @@
+version: '3.8'
+
+services:
+  # FlockCopilot API (ASP.NET Core)
+  api:
+    build:
+      context: ./src/FlockCopilot.Api
+      dockerfile: Dockerfile
+    platform: linux/amd64
+    container_name: flockcopilot-api
+    ports:
+      - "8080:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - DEFAULT_TENANT_ID=tenant-demo-123
+      - COSMOS_DB_ACCOUNT=https://cosmos:8081
+      - COSMOS_DB_DATABASE=flockdata
+      - COSMOS_DB_CONTAINER=normalized
+      - INGEST_STORAGE_ACCOUNT=devstoreaccount1
+      - INGEST_STORAGE_CONTAINER=tenant-demo-123
+      - AI_SERVICE_ENDPOINT=
+      - APPLICATIONINSIGHTS_CONNECTION_STRING=
+    depends_on:
+      - cosmos
+      - azurite
+    networks:
+      - flockcopilot-net
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 10s
+
+  # Azure Cosmos DB Emulator (Linux)
+  cosmos:
+    image: mcr.microsoft.com/cosmosdb/linux/azure-cosmos-emulator:latest
+    container_name: flockcopilot-cosmos
+    ports:
+      - "8081:8081"
+      - "10251:10251"
+      - "10252:10252"
+      - "10253:10253"
+      - "10254:10254"
+    environment:
+      - AZURE_COSMOS_EMULATOR_PARTITION_COUNT=10
+      - AZURE_COSMOS_EMULATOR_ENABLE_DATA_PERSISTENCE=true
+      - AZURE_COSMOS_EMULATOR_IP_ADDRESS_OVERRIDE=127.0.0.1
+    volumes:
+      - cosmos-data:/data/db
+    networks:
+      - flockcopilot-net
+    healthcheck:
+      test: ["CMD", "curl", "-k", "-f", "https://localhost:8081/_explorer/emulator.pem"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 120s
+
+  # Azurite (Azure Storage Emulator)
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite:latest
+    container_name: flockcopilot-azurite
+    ports:
+      - "10000:10000"  # Blob service
+      - "10001:10001"  # Queue service
+      - "10002:10002"  # Table service
+    command: "azurite --blobHost 0.0.0.0 --queueHost 0.0.0.0 --tableHost 0.0.0.0 --loose"
+    volumes:
+      - azurite-data:/data
+    networks:
+      - flockcopilot-net
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "10000"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+volumes:
+  cosmos-data:
+  azurite-data:
+
+networks:
+  flockcopilot-net:
+    driver: bridge
