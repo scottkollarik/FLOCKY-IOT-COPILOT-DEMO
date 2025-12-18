@@ -13,9 +13,12 @@ FlockCopilot is a demo-ready reference implementation for IoT-style telemetry in
 ## Storage Model
 
 - **Cosmos DB database:** `flockdata`
-- **Containers:**
-  - `normalized`: curated rollups (tenant-scoped, time-series friendly)
-  - `raw_telemetry`: full-fidelity snapshots for traceability and future analytics (Fabric/Databricks)
+  - **Containers:**
+    - `normalized`: curated rollups (tenant-scoped, time-series friendly)
+    - `raw_telemetry`: full-fidelity snapshots for traceability and future analytics (Fabric/Databricks)
+
+- **Azure Storage (Blob)**
+  - **Container:** `flock-knowledge-base` (best-practices documents for RAG; indexed by Azure AI Search)
 
 ## Multi-tenant Model
 
