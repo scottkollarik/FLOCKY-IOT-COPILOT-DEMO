@@ -10,6 +10,7 @@
 
 # production
 /build
+/dist
 
 # misc
 .DS_Store
@@ -25,3 +26,4 @@ yarn-error.log*
 # Chat UI
 flockcopilot-chat-ui/node_modules/
 flockcopilot-chat-ui/build/
+flockcopilot-chat-ui/dist/
