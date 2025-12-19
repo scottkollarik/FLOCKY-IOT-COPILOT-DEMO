@@ -1,12 +1,19 @@
 using FlockCopilot.IoTSimulator;
 using Spectre.Console;
 
-var banner = new FigletText("FlockCopilot")
-    .Centered()
-    .Color(Color.Green);
+AnsiConsole.Clear();
 
-AnsiConsole.Write(banner);
-AnsiConsole.Write(new Rule("[yellow]Multi-Sensor IoT Simulator[/]").RuleStyle("grey").LeftJustified());
+var headerGrid = new Grid()
+    .AddColumn(new GridColumn().NoWrap())
+    .AddColumn();
+
+var chickenHead = new Markup("[yellow]  ,~.\n ('v')\n /   \\\n^^^ ^^^[/]");
+var title = new Markup("[bold green]Flocky IoT Simulator[/]\n[grey]Multi-Sensor Zone-Based IoT Telemetry Generator[/]");
+
+headerGrid.AddRow(chickenHead, title);
+
+AnsiConsole.Write(headerGrid);
+AnsiConsole.Write(new Rule().RuleStyle("grey").LeftJustified());
 AnsiConsole.MarkupLine("");
 
 // Configuration
