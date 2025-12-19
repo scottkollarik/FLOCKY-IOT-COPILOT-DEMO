@@ -353,6 +353,31 @@
   white-space: pre-wrap;
 }
 
+.message-text table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0.75rem 0;
+  font-size: 0.95rem;
+}
+
+.message-text th,
+.message-text td {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 0.5rem 0.6rem;
+  vertical-align: top;
+}
+
+.message-text th {
+  background: rgba(255, 255, 255, 0.55);
+  font-weight: 700;
+}
+
+.message-text code {
+  background: rgba(0, 0, 0, 0.06);
+  padding: 0.1rem 0.3rem;
+  border-radius: 6px;
+}
+
 .message-sources {
   margin-top: 0.75rem;
   padding-top: 0.75rem;

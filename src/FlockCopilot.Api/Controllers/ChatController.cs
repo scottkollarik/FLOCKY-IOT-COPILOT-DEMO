@@ -34,7 +34,7 @@ public class ChatController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> ChatAsync([FromBody] ChatRequest request, CancellationToken cancellationToken)
+    public async Task<IActionResult> ChatAsync([FromBody] ChatRequest request, [FromQuery] bool useMarkdown, CancellationToken cancellationToken)
     {
         if (request == null || string.IsNullOrWhiteSpace(request.Message))
         {
@@ -164,6 +164,17 @@ public class ChatController : ControllerBase
             anomalies,
             staleFlocks,
             docs);
+
+        if (useMarkdown)
+        {
+            systemPrompt = systemPrompt + "\n\n" + string.Join('\n', new[]
+            {
+                "Output format:",
+                "- Respond in GitHub-flavored Markdown.",
+                "- If anomalies or errors are present, include a Markdown table with columns: capturedAtUtc, flockId, zone, sensorId, sensorType, metric/value, reason.",
+                "- Use normal Markdown (no HTML, no code fences around the whole answer)."
+            });
+        }
         string answer;
         try
         {

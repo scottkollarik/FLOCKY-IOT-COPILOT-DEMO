@@ -12,6 +12,13 @@ paths:
       summary: Orchestrated chat (telemetry + best practices)
       description: Single entrypoint for natural-language questions. Server decides whether to query telemetry, history, and/or best-practices index.
       parameters:
+        - name: useMarkdown
+          in: query
+          required: false
+          schema:
+            type: boolean
+            default: false
+          description: When true, instructs the orchestrator to format the answer using GitHub-flavored Markdown (tables, lists).
         - name: X-Tenant-Id-Claim
           in: header
           required: false
@@ -123,4 +130,3 @@ components:
         answer:
           type: string
       additionalProperties: true
-

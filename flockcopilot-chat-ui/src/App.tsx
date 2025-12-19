@@ -1,4 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import './App.css';
 
 interface Message {
@@ -37,6 +39,8 @@ function App() {
   const [useCustomTenant, setUseCustomTenant] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const useMarkdown = new URLSearchParams(window.location.search).get('use-markdown') === 'true';
 
   useEffect(() => {
     const el = messagesEndRef.current;
@@ -77,7 +81,9 @@ function App() {
     : {};
 
   const callChatApi = async (message: string): Promise<ChatApiResponse> => {
-    const response = await fetch(`${apiUrl}/api/chat`, {
+    const base = apiUrl.replace(/\/$/, '');
+    const url = `${base}/api/chat${useMarkdown ? '?useMarkdown=true' : ''}`;
+    const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -244,6 +250,11 @@ function App() {
         <p className="mode-hint">
           Auto mode: the API uses telemetry for diagnostics, and pulls best-practices docs for remediation or how-to questions.
         </p>
+        {useMarkdown && (
+          <p className="mode-hint">
+            Markdown rendering enabled (`?use-markdown=true`).
+          </p>
+        )}
         <div className="messages">
           {messages.map((msg, idx) => (
             <div key={idx} className={`message ${msg.role}`}>
@@ -252,7 +263,13 @@ function App() {
                 <span className="timestamp">{msg.timestamp.toLocaleTimeString()}</span>
               </div>
               <div className="message-content">
-                <div className="message-text">{msg.content}</div>
+                <div className="message-text">
+                  {useMarkdown && msg.role === 'assistant' ? (
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>{msg.content}</ReactMarkdown>
+                  ) : (
+                    msg.content
+                  )}
+                </div>
                 {msg.sources && msg.sources.length > 0 && (
                   <div className="message-sources">
                     <div className="sources-title">Sources</div>
