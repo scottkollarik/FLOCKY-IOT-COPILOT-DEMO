@@ -12,6 +12,7 @@ public class IoTDeviceSimulator
     private readonly HttpClient _httpClient = new();
     private readonly Random _random = new();
     private volatile bool _suppressConsoleOutput;
+    private const string HeaderLine = "[green]FlockCopilot[/] [grey]— Multi-Sensor IoT Simulator[/]";
     private const string HotkeyHint = "[grey]Controls:[/] [green]A[/]=Inject anomaly | [green]S[/]=Status | [green]R[/]=Reset | [green]Q[/]=Quit";
 
     public IoTDeviceSimulator(string apiUrl, string tenantId, List<string> buildingIds)
@@ -160,10 +161,13 @@ public class IoTDeviceSimulator
 
         if (table != null)
         {
+            AnsiConsole.MarkupLine(HeaderLine);
+            AnsiConsole.MarkupLine($"[grey]API:[/] {_apiUrl}  [grey]Tenant:[/] {_tenantId}");
+            AnsiConsole.MarkupLine(HotkeyHint);
+            AnsiConsole.MarkupLine("");
+
             AnsiConsole.Write(new Rule($"[yellow]Telemetry Snapshot at {timestamp:HH:mm:ss}[/]").RuleStyle("grey").LeftJustified());
             AnsiConsole.Write(table);
-            AnsiConsole.MarkupLine("");
-            AnsiConsole.MarkupLine(HotkeyHint);
             AnsiConsole.MarkupLine("");
         }
     }
