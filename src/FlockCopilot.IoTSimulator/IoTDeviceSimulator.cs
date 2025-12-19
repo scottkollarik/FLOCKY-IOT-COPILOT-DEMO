@@ -12,7 +12,7 @@ public class IoTDeviceSimulator
     private readonly HttpClient _httpClient = new();
     private readonly Random _random = new();
     private volatile bool _suppressConsoleOutput;
-    private const string HotkeyHint = "[grey]Controls: [green]A[/]=Inject anomaly | [green]S[/]=Status | [green]R[/]=Reset | [green]Q[/]=Quit[/][/]";
+    private const string HotkeyHint = "[grey]Controls:[/] [green]A[/]=Inject anomaly | [green]S[/]=Status | [green]R[/]=Reset | [green]Q[/]=Quit";
 
     public IoTDeviceSimulator(string apiUrl, string tenantId, List<string> buildingIds)
     {
