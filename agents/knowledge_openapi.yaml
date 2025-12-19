@@ -1,0 +1,116 @@
+openapi: 3.0.3
+info:
+  title: FlockCopilot Knowledge API
+  version: 1.0.0
+  description: Best-practices retrieval (Azure AI Search) and secure document download proxy.
+servers:
+  - url: https://YOUR_APIM_NAME.azure-api.net/flockcopilot
+paths:
+  /api/knowledge/search:
+    post:
+      operationId: SearchKnowledge
+      summary: Search best-practices knowledge base
+      parameters:
+        - name: X-Tenant-Id-Claim
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Tenant identifier (demo-only; simulates a tenant claim).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KnowledgeSearchRequest'
+      responses:
+        '200':
+          description: Search results.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KnowledgeSearchResponse'
+        '400':
+          description: Missing query.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+      security:
+        - apimSubscriptionKey: []
+  /api/knowledge/documents/{blobName}:
+    get:
+      operationId: DownloadKnowledgeDocument
+      summary: Download a best-practices document
+      description: Downloads a document from blob storage via the API (avoids direct storage URLs). For nested blob paths, URL-encode slashes in blobName.
+      parameters:
+        - name: X-Tenant-Id-Claim
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Tenant identifier (demo-only; simulates a tenant claim).
+        - name: blobName
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Blob name (file name or path).
+      responses:
+        '200':
+          description: The document content.
+          content:
+            application/octet-stream:
+              schema:
+                type: string
+                format: binary
+        '404':
+          description: Document not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+      security:
+        - apimSubscriptionKey: []
+components:
+  securitySchemes:
+    apimSubscriptionKey:
+      type: apiKey
+      in: header
+      name: Ocp-Apim-Subscription-Key
+      description: APIM subscription key (demo-friendly auth).
+  schemas:
+    KnowledgeSearchRequest:
+      type: object
+      required:
+        - query
+      properties:
+        query:
+          type: string
+          description: Natural language search query.
+      additionalProperties: false
+    KnowledgeDocumentResult:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        source:
+          type: string
+          nullable: true
+        downloadUrl:
+          type: string
+          nullable: true
+      additionalProperties: true
+    KnowledgeSearchResponse:
+      type: object
+      properties:
+        documents:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeDocumentResult'
+      additionalProperties: true
+
