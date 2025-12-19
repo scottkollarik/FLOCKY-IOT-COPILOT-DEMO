@@ -1,0 +1,45 @@
+# FLOCKY-IOT-COPILOT-DEMO — Daily Summary
+
+## Session Overview
+Continued hardening the demo for Thursday: cleaned up the repo, migrated the UI toolchain to Vite (to eliminate CRA/webpack-related Dependabot alerts), and added OpenAPI specs to enable Azure AI Foundry “Custom HTTP tool” integration without exposing Swagger in production.
+
+---
+
+## Key Events & Progress
+
+### [2025-12-19T14:00:00Z] (event_type: maintenance, importance: high)
+- Migrated `flockcopilot-chat-ui` from Create React App (`react-scripts`) to Vite + Vitest.
+- Result: `npm audit` clean locally; removes the CRA/webpack-dev-server toolchain vulnerability noise.
+- Tags: #vite #react #security #dependabot #toolchain
+
+### [2025-12-19T14:20:00Z] (event_type: integration, importance: high)
+- Added OpenAPI specs (with required `operationId`s) to support Azure AI Foundry Custom HTTP tools.
+- Created separate specs per service boundary:
+  - Orchestrator: `POST /api/chat` (single intent entrypoint)
+  - Knowledge: `POST /api/knowledge/search`, `GET /api/knowledge/documents/{blobName}`
+  - Diagnostics (building-specific): `GET /api/flocks/{flockId}/performance`, `GET /api/flocks/{flockId}/history`
+- Tags: #openapi #foundry #agents #tools #api
+
+### [2025-12-19T14:40:00Z] (event_type: architecture, importance: high)
+- Standardized the tool surface to use APIM subscription keys for demo authentication (header `Ocp-Apim-Subscription-Key`) rather than Managed Identity / OAuth.
+- Confirmed that Foundry MCP server creation may be gated behind tenant/SKU (“Upgrade your service…”), so the fallback pattern is: deterministic orchestrator endpoint + OpenAPI tooling.
+- Tags: #apim #auth #mcp #architecture
+
+### [2025-12-19T15:00:00Z] (event_type: repo, importance: normal)
+- Renamed OpenAPI folder from `agents/` to `openapi-specs/` for clarity; removed stale “agent definition import” artifacts that no longer match Foundry’s current UI schemas.
+- Tags: #repo #cleanup #docs
+
+---
+
+## Current State (Demo)
+- **UI**: Vite dev server (`npm run dev`) on `http://localhost:3000`
+- **Backend**: Container App behind APIM; orchestrator via `POST /api/chat`
+- **Best Practices**: AI Search indexed docs; download proxied via API (no direct blob URLs)
+- **Multi-tenant (demo)**: `X-Tenant-Id-Claim` header (static for Foundry tools; dynamic via UI)
+
+---
+
+## Next Steps
+- Decide whether Foundry agent orchestration is “nice-to-have” vs sticking to the server-side `/api/chat` orchestrator for the demo (more deterministic).
+- If attempting Foundry orchestration: add a “list flocks” or tenant-wide anomalies endpoint to avoid tool-call failures due to missing `flockId`.
+
