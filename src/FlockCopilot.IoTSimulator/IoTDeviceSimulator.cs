@@ -11,6 +11,7 @@ public class IoTDeviceSimulator
     private readonly List<Building> _buildings = new();
     private readonly HttpClient _httpClient = new();
     private readonly Random _random = new();
+    private volatile bool _suppressConsoleOutput;
 
     public IoTDeviceSimulator(string apiUrl, string tenantId, List<string> buildingIds)
     {
@@ -64,6 +65,8 @@ public class IoTDeviceSimulator
         }
     }
 
+    public void SetSuppressConsoleOutput(bool suppress) => _suppressConsoleOutput = suppress;
+
     public async Task StartTelemetrySenderAsync(TimeSpan interval, CancellationToken cancellationToken)
     {
         AnsiConsole.MarkupLine("[green]📡 Multi-sensor telemetry system started[/]");
@@ -93,16 +96,21 @@ public class IoTDeviceSimulator
     private async Task SendTelemetryForAllBuildingsAsync()
     {
         var timestamp = DateTimeOffset.UtcNow;
+        var shouldRender = !_suppressConsoleOutput;
 
-        var table = new Table()
-            .Border(TableBorder.Rounded)
-            .AddColumn("[yellow]Sensor[/]")
-            .AddColumn("[grey]Zone[/]")
-            .AddColumn("[cyan]Temp (°F)[/]")
-            .AddColumn("[cyan]Humidity (%)[/]")
-            .AddColumn("[magenta]CO₂ (ppm)[/]")
-            .AddColumn("[yellow]NH₃ (ppm)[/]")
-            .AddColumn("[grey]Status[/]");
+        Table? table = null;
+        if (shouldRender)
+        {
+            table = new Table()
+                .Border(TableBorder.Rounded)
+                .AddColumn("[yellow]Sensor[/]")
+                .AddColumn("[grey]Zone[/]")
+                .AddColumn("[cyan]Temp (°F)[/]")
+                .AddColumn("[cyan]Humidity (%)[/]")
+                .AddColumn("[magenta]CO₂ (ppm)[/]")
+                .AddColumn("[yellow]NH₃ (ppm)[/]")
+                .AddColumn("[grey]Status[/]");
+        }
 
         foreach (var building in _buildings)
         {
@@ -133,7 +141,7 @@ public class IoTDeviceSimulator
                     var tempColor = reading.TemperatureF > 88 ? "red" :
                                    reading.TemperatureF < 70 ? "blue" : "cyan";
 
-                    table.AddRow(
+                    table?.AddRow(
                         sensor.SensorId,
                         $"{zone.ZoneNumber} ({zone.Description})",
                         $"[{tempColor}]{reading.TemperatureF:F1}[/]",
@@ -149,9 +157,12 @@ public class IoTDeviceSimulator
             await SendAggregatedBuildingTelemetryAsync(building, timestamp);
         }
 
-        AnsiConsole.Write(new Rule($"[yellow]Telemetry Snapshot at {timestamp:HH:mm:ss}[/]").RuleStyle("grey").LeftJustified());
-        AnsiConsole.Write(table);
-        AnsiConsole.MarkupLine("");
+        if (table != null)
+        {
+            AnsiConsole.Write(new Rule($"[yellow]Telemetry Snapshot at {timestamp:HH:mm:ss}[/]").RuleStyle("grey").LeftJustified());
+            AnsiConsole.Write(table);
+            AnsiConsole.MarkupLine("");
+        }
     }
 
     private SensorReading GenerateSensorReading(Building building, Zone zone, Sensor sensor, DateTimeOffset timestamp)

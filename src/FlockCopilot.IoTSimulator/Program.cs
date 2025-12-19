@@ -29,93 +29,127 @@ var simulator = new IoTDeviceSimulator(apiUrl, tenantId, buildings);
 var cts = new CancellationTokenSource();
 var telemetryTask = simulator.StartTelemetrySenderAsync(TimeSpan.FromSeconds(sendIntervalSeconds), cts.Token);
 
-// Interactive menu
+AnsiConsole.MarkupLine("[grey]Controls: [green]A[/]=Inject anomaly | [green]S[/]=Status | [green]R[/]=Reset | [green]Q[/]=Quit[/]");
+AnsiConsole.MarkupLine("");
+
 while (true)
 {
-    AnsiConsole.Write(new Rule("[yellow]Anomaly Injection[/]").RuleStyle("grey").LeftJustified());
+    var key = Console.ReadKey(intercept: true).Key;
 
-    var choice = AnsiConsole.Prompt(
-        new SelectionPrompt<string>()
-            .Title("Select an [green]anomaly scenario[/] to inject:")
-            .PageSize(12)
-            .AddChoices(new[]
-            {
-                "🔥 Heat Stress Event (exhaust-end zones)",
-                "🦠 Disease Outbreak (zone-based spread)",
-                "💨 Ventilation Failure (building-wide CO₂/NH₃)",
-                "🌡️ HVAC Malfunction (temp oscillations)",
-                "⚙️ Equipment Failure (single sensor)",
-                "📴 Zone Sensor Outage (entire zone missing)",
-                "📊 View Current Status",
-                "🔄 Reset All to Normal",
-                "❌ Exit"
-            }));
-
-    AnsiConsole.MarkupLine("");
-
-    switch (choice)
+    switch (key)
     {
-        case "🔥 Heat Stress Event (exhaust-end zones)":
-            var heatBuilding = PromptForBuilding(simulator.GetBuildingIds());
-            var heatDuration = AnsiConsole.Ask<int>("Duration (minutes):", 30);
-            simulator.InjectHeatStress(heatBuilding, TimeSpan.FromMinutes(heatDuration));
-            AnsiConsole.MarkupLine($"[grey]→ Effect: Zones 5-6 show elevated temperature, reduced feed intake[/]");
+        case ConsoleKey.A:
+        {
+            simulator.SetSuppressConsoleOutput(true);
+            try
+            {
+                AnsiConsole.Write(new Rule("[yellow]Anomaly Injection[/]").RuleStyle("grey").LeftJustified());
+                var choice = AnsiConsole.Prompt(
+                    new SelectionPrompt<string>()
+                        .Title("Select an [green]anomaly scenario[/] to inject:")
+                        .PageSize(12)
+                        .AddChoices(new[]
+                        {
+                            "🔥 Heat Stress Event (exhaust-end zones)",
+                            "🦠 Disease Outbreak (zone-based spread)",
+                            "💨 Ventilation Failure (building-wide CO₂/NH₃)",
+                            "🌡️ HVAC Malfunction (temp oscillations)",
+                            "⚙️ Equipment Failure (single sensor)",
+                            "📴 Zone Sensor Outage (entire zone missing)",
+                            "↩️ Cancel"
+                        }));
+
+                AnsiConsole.MarkupLine("");
+
+                switch (choice)
+                {
+                    case "🔥 Heat Stress Event (exhaust-end zones)":
+                        var heatBuilding = PromptForBuilding(simulator.GetBuildingIds());
+                        var heatDuration = AnsiConsole.Ask<int>("Duration (minutes):", 30);
+                        simulator.InjectHeatStress(heatBuilding, TimeSpan.FromMinutes(heatDuration));
+                        AnsiConsole.MarkupLine($"[grey]→ Effect: Zones 5-6 show elevated temperature, reduced feed intake[/]");
+                        break;
+
+                    case "🦠 Disease Outbreak (zone-based spread)":
+                        var diseaseBuilding = PromptForBuilding(simulator.GetBuildingIds());
+                        var originZone = AnsiConsole.Ask<int>("Origin zone (1-6):", 3);
+                        var diseaseDuration = AnsiConsole.Ask<int>("Duration (hours):", 12);
+                        simulator.InjectDiseaseOutbreak(diseaseBuilding, originZone, TimeSpan.FromHours(diseaseDuration));
+                        AnsiConsole.MarkupLine($"[grey]→ Effect: Elevated NH₃ and CO₂ in zone {originZone} and adjacent zones[/]");
+                        break;
+
+                    case "💨 Ventilation Failure (building-wide CO₂/NH₃)":
+                        var ventBuilding = PromptForBuilding(simulator.GetBuildingIds());
+                        var ventDuration = AnsiConsole.Ask<int>("Duration (hours):", 2);
+                        simulator.InjectVentilationFailure(ventBuilding, TimeSpan.FromHours(ventDuration));
+                        AnsiConsole.MarkupLine($"[grey]→ Effect: All zones show elevated CO₂ and NH₃, middle zones worst[/]");
+                        break;
+
+                    case "🌡️ HVAC Malfunction (temp oscillations)":
+                        var hvacBuilding = PromptForBuilding(simulator.GetBuildingIds());
+                        var hvacDuration = AnsiConsole.Ask<int>("Duration (hours):", 4);
+                        simulator.InjectHvacMalfunction(hvacBuilding, TimeSpan.FromHours(hvacDuration));
+                        AnsiConsole.MarkupLine($"[grey]→ Effect: Zones 4-6 show temperature oscillations (±15°F)[/]");
+                        break;
+
+                    case "⚙️ Equipment Failure (single sensor)":
+                        var equipBuilding = PromptForBuilding(simulator.GetBuildingIds());
+                        var sensorZone = AnsiConsole.Ask<int>("Which zone (1-6):", 3);
+                        simulator.InjectEquipmentFailure(equipBuilding, sensorZone);
+                        AnsiConsole.MarkupLine($"[grey]→ Effect: Intermittent sensor dropouts in zone {sensorZone}[/]");
+                        break;
+
+                    case "📴 Zone Sensor Outage (entire zone missing)":
+                        var outageBuilding = PromptForBuilding(simulator.GetBuildingIds());
+                        var outageZone = AnsiConsole.Ask<int>("Which zone (1-6):", 3);
+                        var outageDuration = AnsiConsole.Ask<int>("Duration (minutes):", 20);
+                        simulator.InjectZoneSensorOutage(outageBuilding, outageZone, TimeSpan.FromMinutes(outageDuration));
+                        AnsiConsole.MarkupLine($"[grey]→ Effect: All sensors in zone {outageZone} report missing readings[/]");
+                        break;
+                }
+
+                AnsiConsole.MarkupLine("");
+            }
+            finally
+            {
+                simulator.SetSuppressConsoleOutput(false);
+            }
+
+            break;
+        }
+        case ConsoleKey.S:
+            simulator.SetSuppressConsoleOutput(true);
+            try
+            {
+                AnsiConsole.Write(new Rule("[yellow]Current Status[/]").RuleStyle("grey").LeftJustified());
+                simulator.DisplayStatus();
+                AnsiConsole.MarkupLine("");
+            }
+            finally
+            {
+                simulator.SetSuppressConsoleOutput(false);
+            }
             break;
 
-        case "🦠 Disease Outbreak (zone-based spread)":
-            var diseaseBuilding = PromptForBuilding(simulator.GetBuildingIds());
-            var originZone = AnsiConsole.Ask<int>("Origin zone (1-6):", 3);
-            var diseaseDuration = AnsiConsole.Ask<int>("Duration (hours):", 12);
-            simulator.InjectDiseaseOutbreak(diseaseBuilding, originZone, TimeSpan.FromHours(diseaseDuration));
-            AnsiConsole.MarkupLine($"[grey]→ Effect: Elevated NH₃ and CO₂ in zone {originZone} and adjacent zones[/]");
+        case ConsoleKey.R:
+            simulator.SetSuppressConsoleOutput(true);
+            try
+            {
+                simulator.ResetAllAnomalies();
+                AnsiConsole.MarkupLine("");
+            }
+            finally
+            {
+                simulator.SetSuppressConsoleOutput(false);
+            }
             break;
 
-        case "💨 Ventilation Failure (building-wide CO₂/NH₃)":
-            var ventBuilding = PromptForBuilding(simulator.GetBuildingIds());
-            var ventDuration = AnsiConsole.Ask<int>("Duration (hours):", 2);
-            simulator.InjectVentilationFailure(ventBuilding, TimeSpan.FromHours(ventDuration));
-            AnsiConsole.MarkupLine($"[grey]→ Effect: All zones show elevated CO₂ and NH₃, middle zones worst[/]");
-            break;
-
-        case "🌡️ HVAC Malfunction (temp oscillations)":
-            var hvacBuilding = PromptForBuilding(simulator.GetBuildingIds());
-            var hvacDuration = AnsiConsole.Ask<int>("Duration (hours):", 4);
-            simulator.InjectHvacMalfunction(hvacBuilding, TimeSpan.FromHours(hvacDuration));
-            AnsiConsole.MarkupLine($"[grey]→ Effect: Zones 4-6 show temperature oscillations (±15°F)[/]");
-            break;
-
-        case "⚙️ Equipment Failure (single sensor)":
-            var equipBuilding = PromptForBuilding(simulator.GetBuildingIds());
-            var sensorZone = AnsiConsole.Ask<int>("Which zone (1-6):", 3);
-            simulator.InjectEquipmentFailure(equipBuilding, sensorZone);
-            AnsiConsole.MarkupLine($"[grey]→ Effect: Intermittent sensor dropouts in zone {sensorZone}[/]");
-            break;
-
-        case "📴 Zone Sensor Outage (entire zone missing)":
-            var outageBuilding = PromptForBuilding(simulator.GetBuildingIds());
-            var outageZone = AnsiConsole.Ask<int>("Which zone (1-6):", 3);
-            var outageDuration = AnsiConsole.Ask<int>("Duration (minutes):", 20);
-            simulator.InjectZoneSensorOutage(outageBuilding, outageZone, TimeSpan.FromMinutes(outageDuration));
-            AnsiConsole.MarkupLine($"[grey]→ Effect: All sensors in zone {outageZone} report missing readings[/]");
-            break;
-
-        case "📊 View Current Status":
-            AnsiConsole.MarkupLine("");
-            simulator.DisplayStatus();
-            break;
-
-        case "🔄 Reset All to Normal":
-            simulator.ResetAllAnomalies();
-            break;
-
-        case "❌ Exit":
+        case ConsoleKey.Q:
             AnsiConsole.MarkupLine("[yellow]Stopping multi-sensor simulator...[/]");
             cts.Cancel();
             await telemetryTask;
             return;
     }
-
-    AnsiConsole.MarkupLine("");
 }
 
 static string PromptForBuilding(List<string> buildings)
