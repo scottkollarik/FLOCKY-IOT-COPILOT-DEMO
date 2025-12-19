@@ -7,10 +7,19 @@ var headerGrid = new Grid()
     .AddColumn(new GridColumn().NoWrap())
     .AddColumn();
 
-var chickenHead = new Markup("[yellow]  ,~.\n ('v')\n /   \\\n^^^ ^^^[/]");
-var title = new Markup("[bold green]Flocky IoT Simulator[/]\n[grey]Multi-Sensor Zone-Based IoT Telemetry Generator[/]");
+var chickenProfile = new Markup(
+    "[yellow]      __\n" +
+    "  __(o )>\n" +
+    "  \\ <_. )\n" +
+    "   `---'[/]");
 
-headerGrid.AddRow(chickenHead, title);
+var title = new Rows(
+    new FigletText("Flocky IoT")
+        .LeftJustified()
+        .Color(Color.Green),
+    new Markup("[bold green]Simulator[/]  [grey]— Multi-Sensor Zone-Based IoT Telemetry Generator[/]"));
+
+headerGrid.AddRow(chickenProfile, title);
 
 AnsiConsole.Write(headerGrid);
 AnsiConsole.Write(new Rule().RuleStyle("grey").LeftJustified());
