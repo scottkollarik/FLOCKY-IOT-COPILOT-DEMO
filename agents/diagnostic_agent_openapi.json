@@ -6,14 +6,24 @@
   },
   "servers": [
     {
-      "url": "https://func-flocky-63suqxsltdrwo.azurewebsites.net"
+      "url": "https://YOUR_APIM_NAME.azure-api.net/flockcopilot"
     }
   ],
   "paths": {
     "/api/flocks/{flockId}/performance": {
       "get": {
+        "operationId": "GetFlockPerformance",
         "summary": "Get latest flock performance snapshot",
         "parameters": [
+          {
+            "name": "X-Tenant-Id-Claim",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Tenant identifier (simulates a claim)."
+          },
           {
             "name": "flockId",
             "in": "path",
@@ -40,8 +50,18 @@
     },
     "/api/flocks/{flockId}/history": {
       "get": {
+        "operationId": "GetFlockHistory",
         "summary": "Get historical flock performance data",
         "parameters": [
+          {
+            "name": "X-Tenant-Id-Claim",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Tenant identifier (simulates a claim)."
+          },
           {
             "name": "flockId",
             "in": "path",
