@@ -4,5 +4,5 @@ import { test, expect } from 'vitest';
 
 test('renders learn react link', () => {
   render(<App />);
-  expect(screen.getByRole('heading', { name: /FlockCopilot Diagnostic Agent/i })).toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: /Flocky Chat/i })).toBeInTheDocument();
 });

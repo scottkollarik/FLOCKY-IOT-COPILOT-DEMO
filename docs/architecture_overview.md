@@ -16,6 +16,7 @@ FlockCopilot is a demo-ready reference implementation for IoT-style telemetry in
   - **Containers:**
     - `normalized`: curated rollups (tenant-scoped, time-series friendly)
     - `raw_telemetry`: full-fidelity snapshots for traceability and future analytics (Fabric/Databricks)
+    - `anomalies`: long-lived anomaly evidence for audit/alerts (SIEM-ready feed)
 
 - **Azure Storage (Blob)**
   - **Container:** `flock-knowledge-base` (best-practices documents for RAG; indexed by Azure AI Search)

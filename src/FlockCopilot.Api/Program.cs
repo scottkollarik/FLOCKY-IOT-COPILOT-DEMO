@@ -31,6 +31,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ITenantContext, TenantContext>();
 builder.Services.AddSingleton<INormalizer, Normalizer>();
+builder.Services.AddSingleton<IAnomalyDetector, AnomalyDetector>();
 builder.Services.AddHttpClient<IManualReportExtractor, ManualReportExtractor>();
 builder.Services.AddHttpClient<IAzureOpenAiChatService, AzureOpenAiChatService>();
 builder.Services.AddSingleton<CosmosContainerProvider>();
@@ -59,6 +60,13 @@ builder.Services.AddSingleton<IRawTelemetryRepository>(sp =>
     var provider = sp.GetRequiredService<CosmosContainerProvider>();
     var logger = sp.GetRequiredService<ILogger<CosmosRawTelemetryRepository>>();
     return new CosmosRawTelemetryRepository(provider, logger);
+});
+
+builder.Services.AddSingleton<IAnomalyRepository>(sp =>
+{
+    var provider = sp.GetRequiredService<CosmosContainerProvider>();
+    var logger = sp.GetRequiredService<ILogger<CosmosAnomalyRepository>>();
+    return new CosmosAnomalyRepository(provider, logger);
 });
 
 // Health checks

@@ -10,6 +10,47 @@
     }
   ],
   "paths": {
+    "/api/anomalies": {
+      "get": {
+        "operationId": "GetAnomalies",
+        "summary": "Get recent anomalies (tenant-scoped)",
+        "parameters": [
+          {
+            "name": "X-Tenant-Id-Claim",
+            "in": "header",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Tenant identifier (simulates a claim)."
+          },
+          {
+            "name": "window",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "default": "48h"
+            },
+            "description": "Lookback window such as 48h or 7d. Defaults to 48h."
+          },
+          {
+            "name": "flockId",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Optional flock/building id filter (e.g. building-a)."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Recent anomaly records."
+          }
+        }
+      }
+    },
     "/api/flocks/{flockId}/performance": {
       "get": {
         "operationId": "GetFlockPerformance",

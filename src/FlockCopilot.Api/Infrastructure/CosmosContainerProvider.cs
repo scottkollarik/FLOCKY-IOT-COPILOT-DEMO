@@ -13,6 +13,7 @@ public class CosmosContainerProvider
     private CosmosClient? _client;
     private Container? _normalizedContainer;
     private Container? _telemetryContainer;
+    private Container? _anomaliesContainer;
 
     public CosmosContainerProvider(IConfiguration configuration, ILogger<CosmosContainerProvider> logger)
     {
@@ -87,6 +88,40 @@ public class CosmosContainerProvider
         }
 
         return _telemetryContainer;
+    }
+
+    public Container? GetAnomaliesContainer()
+    {
+        if (_anomaliesContainer != null)
+        {
+            return _anomaliesContainer;
+        }
+
+        var containerName = _configuration["COSMOS_DB_ANOMALIES_CONTAINER"];
+        if (string.IsNullOrWhiteSpace(containerName))
+        {
+            _logger.LogWarning("COSMOS_DB_ANOMALIES_CONTAINER is not configured; anomalies will not be persisted.");
+            return null;
+        }
+
+        try
+        {
+            var client = GetClient();
+            if (client == null)
+            {
+                return null;
+            }
+
+            var databaseName = _configuration["COSMOS_DB_DATABASE"]!;
+            _anomaliesContainer = client.GetContainer(databaseName, containerName);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to create Cosmos anomalies container client.");
+            _anomaliesContainer = null;
+        }
+
+        return _anomaliesContainer;
     }
 
     private CosmosClient? GetClient()

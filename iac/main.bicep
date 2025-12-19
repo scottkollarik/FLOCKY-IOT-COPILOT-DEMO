@@ -18,6 +18,12 @@ param cosmosContainerName string = 'normalized'
 @description('Cosmos DB container name that stores raw telemetry snapshots (batched sensors[]).')
 param cosmosTelemetryContainerName string = 'raw_telemetry'
 
+@description('Cosmos DB container name that stores anomaly evidence for long-term retention (alerts/SIEM-ready).')
+param cosmosAnomaliesContainerName string = 'anomalies'
+
+@description('TTL in seconds for anomaly evidence. Set to -1 to disable TTL (retain indefinitely).')
+param cosmosAnomaliesTtlSeconds int = 2592000
+
 @description('Azure AI Foundry / Cognitive Services SKU.')
 param aiServiceSku string = 'S0'
 
@@ -259,6 +265,37 @@ resource cosmosTelemetryContainer 'Microsoft.DocumentDB/databaseAccounts/sqlData
   }
 }
 
+resource cosmosAnomaliesContainer 'Microsoft.DocumentDB/databaseAccounts/sqlDatabases/containers@2023-04-15' = {
+  name: cosmosAnomaliesContainerName
+  parent: cosmosDatabase
+  properties: {
+    resource: {
+      id: cosmosAnomaliesContainerName
+      partitionKey: {
+        paths: [
+          '/tenantId'
+        ]
+        kind: 'Hash'
+      }
+      indexingPolicy: {
+        indexingMode: 'consistent'
+        includedPaths: [
+          {
+            path: '/*'
+          }
+        ]
+        excludedPaths: [
+          {
+            path: '/"_etag"/?'
+          }
+        ]
+      }
+      // Anomaly evidence is lower-volume and useful for audit, alerts, and future SIEM integration.
+      defaultTtl: cosmosAnomaliesTtlSeconds
+    }
+  }
+}
+
 resource aiAccount 'Microsoft.CognitiveServices/accounts@2023-05-01' = {
   name: aiAccountName
   location: location
@@ -370,6 +407,10 @@ resource containerApp 'Microsoft.App/containerApps@2023-05-01' = {
             {
               name: 'COSMOS_DB_TELEMETRY_CONTAINER'
               value: cosmosTelemetryContainerName
+            }
+            {
+              name: 'COSMOS_DB_ANOMALIES_CONTAINER'
+              value: cosmosAnomaliesContainerName
             }
             {
               name: 'KNOWLEDGE_STORAGE_CONTAINER'
@@ -511,6 +552,7 @@ output cosmosAccountEndpoint string = cosmosEndpoint
 output cosmosDatabase string = cosmosDatabaseName
 output cosmosContainer string = cosmosContainerName
 output cosmosTelemetryContainer string = cosmosTelemetryContainerName
+output cosmosAnomaliesContainer string = cosmosAnomaliesContainerName
 output logAnalyticsWorkspaceId string = logAnalytics.id
 output knowledgeContainer string = knowledgeContainerName
 output azureSearchServiceName string = searchService.name

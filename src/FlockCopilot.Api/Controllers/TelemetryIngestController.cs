@@ -11,6 +11,8 @@ public class TelemetryIngestController : ControllerBase
 {
     private readonly ILogger<TelemetryIngestController> _logger;
     private readonly INormalizer _normalizer;
+    private readonly IAnomalyDetector _anomalyDetector;
+    private readonly IAnomalyRepository _anomalyRepository;
     private readonly INormalizedFlockRepository _repository;
     private readonly IRawTelemetryRepository _rawTelemetryRepository;
     private readonly ITenantContext _tenantContext;
@@ -18,12 +20,16 @@ public class TelemetryIngestController : ControllerBase
     public TelemetryIngestController(
         ILogger<TelemetryIngestController> logger,
         INormalizer normalizer,
+        IAnomalyDetector anomalyDetector,
+        IAnomalyRepository anomalyRepository,
         INormalizedFlockRepository repository,
         IRawTelemetryRepository rawTelemetryRepository,
         ITenantContext tenantContext)
     {
         _logger = logger;
         _normalizer = normalizer;
+        _anomalyDetector = anomalyDetector;
+        _anomalyRepository = anomalyRepository;
         _repository = repository;
         _rawTelemetryRepository = rawTelemetryRepository;
         _tenantContext = tenantContext;
@@ -121,10 +127,12 @@ public class TelemetryIngestController : ControllerBase
         };
 
         var normalized = _normalizer.Normalize(raw);
+        var anomalies = _anomalyDetector.Detect(rawSnapshot);
         try
         {
             await _rawTelemetryRepository.UpsertAsync(rawSnapshot, ct);
             await _repository.UpsertAsync(normalized, ct);
+            await _anomalyRepository.UpsertManyAsync(anomalies, ct);
         }
         catch (Exception ex)
         {

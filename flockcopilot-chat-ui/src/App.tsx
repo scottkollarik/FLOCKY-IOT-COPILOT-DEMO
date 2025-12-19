@@ -25,7 +25,7 @@ function App() {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'system',
-      content: 'FlockCopilot ready. Ask about live flock performance, anomalies, trends, or best-practices remediation.',
+      content: 'Flocky Chat ready. Ask about live flock performance, anomalies, trends, or best-practices remediation.',
       timestamp: new Date()
     }
   ]);
@@ -179,7 +179,10 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>🐔 FlockCopilot Diagnostic Agent</h1>
+        <div className="header-left">
+          <div className="logo-chicken"></div>
+          <h1>Flocky Chat</h1>
+        </div>
         <div className="tenant-controls">
           <span className="tenant-label">Tenant</span>
           {useCustomTenant ? (
