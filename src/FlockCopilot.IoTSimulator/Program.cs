@@ -8,10 +8,23 @@ var headerGrid = new Grid()
     .AddColumn();
 
 var chickenProfile = new Markup(
-    "[yellow]      __\n" +
-    "  __(o )>\n" +
-    "  \\ <_. )\n" +
-    "   `---'[/]");
+    "[yellow]      ,~.\n" +
+    "   ,-'__ `-,\n" +
+    "  {,-'  `. }              ,')\n" +
+    " ,( a )   `-.__         ,',')~,\n" +
+    "<=.) (         `-.__,==' ' ' '}\n" +
+    "  (   )                      /)\n" +
+    "   `-'\\   ,                    )\n" +
+    "       |  \\        `~.        /\n" +
+    "       \\   `._        \\      /\n" +
+    "        \\     `._____,'    ,'\n" +
+    "         `-.             ,'\n" +
+    "            `-._     _,-'\n" +
+    "                77jj'\n" +
+    "               //_||\n" +
+    "            __//--'/`\n" +
+    "          ,--'/`  '\n" +
+    "[/]");
 
 var title = new Rows(
     new FigletText("Flocky IoT")
