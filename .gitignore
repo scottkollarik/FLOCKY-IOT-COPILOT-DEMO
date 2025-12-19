@@ -129,6 +129,8 @@ docs/diagrams/
 docs/diagrams/**
 docs/best-practices/
 docs/best-practices/**
+docs/daily_summaries/
+docs/daily_summaries/**
 iac/APIM_*.md
 iac/*APIM*.md
 iac/QUICK_START_APIM.md
