@@ -4,62 +4,27 @@ using Spectre.Console;
 AnsiConsole.Clear();
 
 var headerGrid = new Grid()
-    .AddColumn(new GridColumn().NoWrap())
-    .AddColumn();
+    .AddColumn()
+    .AddColumn(new GridColumn().NoWrap());
 
-static string MirrorAscii(string input)
-{
-    static char Map(char c) => c switch
-    {
-        '(' => ')',
-        ')' => '(',
-        '{' => '}',
-        '}' => '{',
-        '[' => ']',
-        ']' => '[',
-        '<' => '>',
-        '>' => '<',
-        '/' => '\\',
-        '\\' => '/',
-        _ => c
-    };
-
-    var chars = input.ToCharArray();
-    Array.Reverse(chars);
-    for (var i = 0; i < chars.Length; i++)
-    {
-        chars[i] = Map(chars[i]);
-    }
-
-    return new string(chars);
-}
-
-var chickenProfileLeft = """
-      ,~.
-   ,-'__ `-,
-  {,-'  `. }              ,')
- ,( a )   `-.__         ,',')~,
-<=.) (         `-.__,==' ' ' '}
-  (   )                      /)
-   `-'\   ,                    )
-       |  \        `~.        /
-       \   `._        \      /
-        \     `._____,'    ,'
-         `-.             ,'
-            `-._     _,-'
-                77jj'
-               //_||
-            __//--'/`
-          ,--'/`  '
-""";
-
-var chickenProfileRight = string.Join(
-    "\n",
-    chickenProfileLeft
-        .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-        .Select(MirrorAscii));
-
-var chickenProfile = new Markup($"[yellow]{chickenProfileRight}[/]");
+var chickenProfile = new Markup(
+    "[yellow]      ,~.\n" +
+    "   ,-'__ `-,\n" +
+    "  {,-'  `. }              ,')\n" +
+    " ,( a )   `-.__         ,',')~,\n" +
+    "<=.) (         `-.__,==' ' ' '}\n" +
+    "  (   )                      /)\n" +
+    "   `-'\\   ,                    )\n" +
+    "       |  \\        `~.        /\n" +
+    "       \\   `._        \\      /\n" +
+    "        \\     `._____,'    ,'\n" +
+    "         `-.             ,'\n" +
+    "            `-._     _,-'\n" +
+    "                77jj'\n" +
+    "               //_||\n" +
+    "            __//--'/`\n" +
+    "          ,--'/`  '\n" +
+    "[/]");
 
 var title = new Rows(
     new FigletText("Flocky IoT")
@@ -67,7 +32,7 @@ var title = new Rows(
         .Color(Color.Green),
     new Markup("[bold green]Simulator[/]  [grey]— Multi-Sensor Zone-Based IoT Telemetry Generator[/]"));
 
-headerGrid.AddRow(chickenProfile, title);
+headerGrid.AddRow(title, chickenProfile);
 
 AnsiConsole.Write(headerGrid);
 AnsiConsole.Write(new Rule().RuleStyle("grey").LeftJustified());
