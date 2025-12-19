@@ -7,24 +7,59 @@ var headerGrid = new Grid()
     .AddColumn(new GridColumn().NoWrap())
     .AddColumn();
 
-var chickenProfile = new Markup(
-    "[yellow]      ,~.\n" +
-    "   ,-'__ `-,\n" +
-    "  {,-'  `. }              ,')\n" +
-    " ,( a )   `-.__         ,',')~,\n" +
-    "<=.) (         `-.__,==' ' ' '}\n" +
-    "  (   )                      /)\n" +
-    "   `-'\\   ,                    )\n" +
-    "       |  \\        `~.        /\n" +
-    "       \\   `._        \\      /\n" +
-    "        \\     `._____,'    ,'\n" +
-    "         `-.             ,'\n" +
-    "            `-._     _,-'\n" +
-    "                77jj'\n" +
-    "               //_||\n" +
-    "            __//--'/`\n" +
-    "          ,--'/`  '\n" +
-    "[/]");
+static string MirrorAscii(string input)
+{
+    static char Map(char c) => c switch
+    {
+        '(' => ')',
+        ')' => '(',
+        '{' => '}',
+        '}' => '{',
+        '[' => ']',
+        ']' => '[',
+        '<' => '>',
+        '>' => '<',
+        '/' => '\\',
+        '\\' => '/',
+        _ => c
+    };
+
+    var chars = input.ToCharArray();
+    Array.Reverse(chars);
+    for (var i = 0; i < chars.Length; i++)
+    {
+        chars[i] = Map(chars[i]);
+    }
+
+    return new string(chars);
+}
+
+var chickenProfileLeft = """
+      ,~.
+   ,-'__ `-,
+  {,-'  `. }              ,')
+ ,( a )   `-.__         ,',')~,
+<=.) (         `-.__,==' ' ' '}
+  (   )                      /)
+   `-'\   ,                    )
+       |  \        `~.        /
+       \   `._        \      /
+        \     `._____,'    ,'
+         `-.             ,'
+            `-._     _,-'
+                77jj'
+               //_||
+            __//--'/`
+          ,--'/`  '
+""";
+
+var chickenProfileRight = string.Join(
+    "\n",
+    chickenProfileLeft
+        .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+        .Select(MirrorAscii));
+
+var chickenProfile = new Markup($"[yellow]{chickenProfileRight}[/]");
 
 var title = new Rows(
     new FigletText("Flocky IoT")
