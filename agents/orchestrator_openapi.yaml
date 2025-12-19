@@ -1,0 +1,126 @@
+openapi: 3.0.3
+info:
+  title: FlockCopilot Orchestrator API
+  version: 1.0.0
+  description: Intent-orchestrated chat endpoint that grounds answers in telemetry and best-practices retrieval.
+servers:
+  - url: https://YOUR_APIM_NAME.azure-api.net/flockcopilot
+paths:
+  /api/chat:
+    post:
+      operationId: ChatOrchestrator
+      summary: Orchestrated chat (telemetry + best practices)
+      description: Single entrypoint for natural-language questions. Server decides whether to query telemetry, history, and/or best-practices index.
+      parameters:
+        - name: X-Tenant-Id-Claim
+          in: header
+          required: false
+          schema:
+            type: string
+          description: Tenant identifier (demo-only; simulates a tenant claim).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatRequest'
+      responses:
+        '200':
+          description: Orchestrated response with grounded answer and optional source documents.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+        '501':
+          description: Azure OpenAI not configured.
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties: true
+      security:
+        - apimSubscriptionKey: []
+components:
+  securitySchemes:
+    apimSubscriptionKey:
+      type: apiKey
+      in: header
+      name: Ocp-Apim-Subscription-Key
+      description: APIM subscription key (demo-friendly auth).
+  schemas:
+    ChatRequest:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+        mode:
+          type: string
+          description: auto | diagnostics | bestPractices
+          default: auto
+        flockId:
+          type: string
+          description: Optional target flock/building id (e.g. building-a).
+        clientNowUtc:
+          type: string
+          format: date-time
+          description: Client-side 'now' in UTC, for interpreting relative time phrases.
+        tzOffsetMinutes:
+          type: integer
+          description: Client timezone offset in minutes (e.g. EST is typically -300 or -240 depending on DST).
+      additionalProperties: false
+    ChatResponse:
+      type: object
+      properties:
+        tenantId:
+          type: string
+        mode:
+          type: string
+        flockId:
+          type: string
+          nullable: true
+        analyzedFlocks:
+          type: array
+          items:
+            type: string
+        usedHistory:
+          type: boolean
+        historyWindow:
+          type: string
+          nullable: true
+        anomalies:
+          type: array
+          items:
+            type: string
+        staleFlocks:
+          type: array
+          items:
+            type: string
+        bestPracticesDocumentCount:
+          type: integer
+        bestPracticesDocuments:
+          type: array
+          items:
+            type: object
+            properties:
+              title:
+                type: string
+                nullable: true
+              source:
+                type: string
+              downloadUrl:
+                type: string
+                nullable: true
+            additionalProperties: false
+        answer:
+          type: string
+      additionalProperties: true
+
